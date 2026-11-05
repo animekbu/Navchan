@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1020">
+<meta name="description" content="A goofy anonymous birthday adventure for Nav-chan.">
+<title>NAV-CHAN.EXE — Birthday Side Quest</title>
+<style>
+:root{
+  --bg:#090f1d;--bg2:#101a30;--panel:#121f38;--panel2:#172744;--panel3:#1d3152;
+  --ink:#f0f5ff;--muted:#a7b5cf;--cyan:#55e6ef;--cyan2:#20b9cd;--pink:#ff6c91;
+  --violet:#a78bfa;--yellow:#ffe16a;--orange:#ffad66;--line:#2a4166;--good:#83f0b1;
+  --shadow:0 18px 55px rgba(0,0,0,.38);--pixel:ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 16% 0%,#172a4a 0,transparent 38%),radial-gradient(ellipse at 90% 13%,#2b1740 0,transparent 30%),var(--bg);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.13;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,black,transparent 90%)}
+button{font:inherit}button:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+button:disabled{opacity:.38;cursor:not-allowed!important;transform:none!important}
+#ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.ambient-star{position:absolute;color:var(--cyan);font-family:var(--pixel);font-size:12px;opacity:.38;animation:blink 2.9s steps(2) infinite}
+@keyframes blink{50%{opacity:1;transform:scale(1.35)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #55e6ef20}50%{box-shadow:0 0 0 9px #55e6ef08}}
+@keyframes pop{0%{transform:scale(.88);opacity:0}75%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:.62}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+@keyframes scan{to{background-position:0 12px}}
+@keyframes driveLeft{0%{transform:translateX(115vw)}100%{transform:translateX(-140vw)}}
+@keyframes flashR{0%,100%{background:rgba(255,40,91,.05)}50%{background:rgba(255,30,80,.31)}}
+@keyframes flashB{0%,100%{background:rgba(35,112,255,.07)}50%{background:rgba(35,112,255,.34)}}
+@keyframes siren{0%,100%{filter:brightness(1.25);opacity:1}50%{filter:brightness(.6);opacity:.42}}
+@keyframes confettiFall{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+@keyframes typingBlink{50%{border-color:transparent}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+@keyframes runLeg{to{transform:rotate(25deg)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+.wrap{position:relative;z-index:1;width:min(1100px,calc(100% - 28px));margin:auto;padding:18px 0 52px}
+.hud{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 13px;margin-bottom:15px;background:#0d1729d9;border:1px solid var(--line);border-radius:13px;box-shadow:0 8px 30px #0003;position:sticky;top:8px;z-index:10;backdrop-filter:blur(14px)}
+.brand{font:800 .75rem var(--pixel);letter-spacing:.06em;color:var(--cyan);white-space:nowrap}.brand span{color:var(--pink)}
+.stage-meta{display:flex;align-items:center;gap:9px;min-width:0;flex:1;justify-content:center}.stage-name{font:700 .66rem var(--pixel);color:var(--muted);white-space:nowrap}.quest-track{height:7px;width:min(190px,27vw);background:#253653;border:1px solid #385071;border-radius:99px;overflow:hidden}.quest-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));transition:width .35s ease}
+.sound-toggle{border:1px solid var(--line);border-radius:9px;background:#172641;color:var(--ink);padding:8px 10px;font:700 .65rem var(--pixel);cursor:pointer;white-space:nowrap}.sound-toggle.on{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 16px #55e6ef22}
+.screen{display:none;animation:pop .35s ease both}.screen.active{display:block}
+.panel{background:linear-gradient(145deg,#14223d,#0e192d);border:1px solid #2b4268;border-radius:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;padding:clamp(19px,4vw,38px)}
+.panel:before{content:"";position:absolute;inset:0;pointer-events:none;border:1px solid #ffffff08;border-radius:inherit}
+.kicker{margin:0 0 12px;color:var(--cyan);font:700 .67rem var(--pixel);letter-spacing:.12em;text-transform:uppercase}
+h1,h2,h3,p{margin-top:0}h1{font:900 clamp(2.35rem,7vw,5.7rem)/.98 var(--pixel);letter-spacing:-.08em;margin:0 0 17px;text-transform:uppercase}h2{font:900 clamp(1.7rem,4.8vw,3.25rem)/1.05 var(--pixel);letter-spacing:-.055em;margin:0 0 12px}h3{font:800 clamp(1.05rem,2.7vw,1.45rem)/1.2 var(--pixel);margin:0 0 12px}.cyan{color:var(--cyan)}.pink{color:var(--pink)}.yellow{color:var(--yellow)}.muted{color:var(--muted)}.tiny{font:600 .67rem var(--pixel);line-height:1.65;color:var(--muted)}.center{text-align:center}
+.btn{border:1px solid transparent;border-radius:9px;min-height:45px;padding:12px 17px;font:800 .72rem var(--pixel);letter-spacing:.025em;cursor:pointer;transition:transform .15s,filter .15s,box-shadow .15s;background:#203554;color:var(--ink);box-shadow:0 5px 0 #07101f;}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.12)}.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #07101f}.btn.primary{background:var(--yellow);color:#1d2232;box-shadow:0 5px 0 #a88732}.btn.cyan-btn{background:var(--cyan);color:#071a25;box-shadow:0 5px 0 #147b88}.btn.pink-btn{background:var(--pink);color:#2b1320;box-shadow:0 5px 0 #a8395a}.btn.ghost{background:#0c1728;border-color:#314a70;color:var(--muted);box-shadow:0 5px 0 #060b14}.btn-row{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:22px}
+.boot{min-height:min(730px,calc(100svh - 105px));display:grid;align-items:center;text-align:center;background:radial-gradient(ellipse at 50% 80%,#1a3960 0,transparent 52%),linear-gradient(145deg,#111e36,#0b1425)}
+.boot-inner{max-width:850px;margin:auto}.pixel-badge{display:inline-flex;border:1px solid #426080;background:#0d1a2d;color:var(--yellow);padding:7px 10px;font:700 .62rem var(--pixel);letter-spacing:.1em;margin-bottom:19px;box-shadow:4px 4px 0 #07101e}
+.hero-sprite{height:145px;display:flex;justify-content:center;align-items:center;gap:22px;margin:0 auto 17px}.sprite-card{width:100px;height:116px;display:grid;place-items:center;position:relative;animation:float 2.3s steps(4) infinite}.sprite-face{width:58px;height:62px;background:#ffcfaa;border:5px solid #17223b;box-shadow:inset -7px -8px #df9a9a,0 8px 0 #080f1c;position:relative;image-rendering:pixelated}.sprite-face:before{content:"";position:absolute;left:-6px;top:-14px;width:60px;height:28px;background:#382f5b;border:4px solid #17223b;clip-path:polygon(0 0,100% 0,100% 65%,78% 65%,68% 100%,51% 65%,31% 100%,20% 63%,0 75%)}.sprite-eyes{position:absolute;top:21px;left:11px;right:11px;display:flex;justify-content:space-between}.sprite-eyes i{width:6px;height:9px;background:#20243b}.sprite-mouth{position:absolute;left:25px;top:38px;color:#8f4e6d;font-weight:900;font-size:11px}.sprite-shadow{position:absolute;bottom:0;width:74px;height:8px;background:#050a13;border-radius:50%;filter:blur(1px)}.envelope{font-size:48px;filter:drop-shadow(4px 5px 0 #050b17);transform:rotate(8deg);animation:float 2.3s steps(4) infinite reverse}
+.title-glitch{color:var(--ink);text-shadow:4px 4px 0 #1b7b8d,-3px -3px 0 #a33f65}.boot-lines{font:600 clamp(.72rem,2vw,.9rem)/2 var(--pixel);color:#bac8df;margin:16px 0 25px}.boot-lines strong{color:var(--pink)}.blink{animation:flicker 1.1s steps(2) infinite;color:var(--yellow);font:800 .75rem var(--pixel);margin:18px 0 0}
+.dialogue{border:1px solid #3a5479;background:linear-gradient(120deg,#101d34,#142540);box-shadow:0 8px 0 #070e1a;border-radius:12px;padding:16px 17px;position:relative;margin-top:20px}.speaker{font:800 .64rem var(--pixel);letter-spacing:.1em;color:var(--pink);margin-bottom:9px}.dialogue-text{font-size:clamp(.94rem,2.2vw,1.06rem);line-height:1.85;color:#e2ebfa;min-height:3.6em;white-space:pre-line}.dialogue-text.typing:after{content:"";display:inline-block;width:7px;height:1em;background:var(--cyan);vertical-align:-2px;margin-left:4px;animation:typingBlink .8s steps(1) infinite}
+.intro-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(230px,.75fr);gap:18px;align-items:stretch}.intro-copy{font-size:1rem;line-height:1.9;color:#d3def1}.intro-copy p{margin:0 0 12px}.quote{font-family:Georgia,serif;font-style:italic;color:#b9a8ff}.photo-stack{display:grid;gap:13px}.photo-slot{border:1px dashed #466080;background:#0d192b;border-radius:12px;padding:11px;min-width:0}.photo-frame{height:170px;border-radius:8px;background:repeating-linear-gradient(135deg,#152742,#152742 10px,#192e4d 10px,#192e4d 20px);display:grid;place-items:center;overflow:hidden}.photo-frame img{height:100%;width:100%;object-fit:cover;display:none}.photo-placeholder{text-align:center;padding:12px;color:#8fa1bf;font:600 .63rem/1.8 var(--pixel)}.photo-placeholder b{display:block;font-size:2.1rem;color:var(--cyan);margin-bottom:5px}.photo-label{font:700 .63rem var(--pixel);color:var(--yellow);margin:9px 1px 1px}
+.platform-wrap{background:#0a1425;border:1px solid #2b4268;border-radius:15px;padding:12px;box-shadow:inset 0 0 30px #0005}.game-top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;padding:3px 3px 11px}.game-chip{font:700 .63rem var(--pixel);border:1px solid #344e72;background:#132440;padding:7px 9px;border-radius:7px;color:#cfdaed}.game-chip b{color:var(--yellow)}
+#platformCanvas{display:block;width:100%;height:auto;aspect-ratio:960/430;border:1px solid #405779;border-radius:8px;background:#101d34;image-rendering:pixelated;touch-action:none;}
+.game-controls{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap}.move-controls{display:flex;gap:8px}.game-key{width:57px;height:49px;border:1px solid #3a5378;background:#192b48;color:#f1f5ff;border-radius:9px;font:900 1rem var(--pixel);box-shadow:0 4px 0 #060d18;touch-action:none;user-select:none}.game-key:active,.game-key.held{background:var(--cyan);color:#061721;transform:translateY(2px);box-shadow:0 2px 0 #060d18}.jump-key{width:92px;background:#45334e;border-color:#815073;color:#ffd7e3}.control-help{font:600 .61rem/1.6 var(--pixel);color:#94a7c7;flex:1;text-align:center;min-width:150px}.game-overlay{position:absolute;inset:42px 12px 12px;display:none;place-items:center;background:#07101ddd;border-radius:8px;text-align:center;padding:18px;z-index:2}.game-overlay.show{display:grid}.overlay-box{max-width:430px;border:1px solid #3b5a7e;background:#12213b;padding:24px;border-radius:12px;box-shadow:0 12px 30px #0008}.overlay-box h3{color:var(--yellow)}.overlay-box p{line-height:1.7;color:#c4d1e7}
+.quest-brief{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:center;margin:0 0 12px}.quest-brief p{line-height:1.6;color:#aebed8;margin:0;font-size:.9rem}.lives{font:700 .67rem var(--pixel);color:var(--pink);white-space:nowrap}
+.case-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px}.case-sidebar{border:1px solid #2b4268;border-radius:12px;background:#0b1628;padding:13px}.case-sidebar h3{font-size:.72rem;color:var(--yellow)}.case-list{display:grid;gap:7px}.case-tab{text-align:left;border:1px solid #2d4262;background:#13223b;color:#aebed8;border-radius:7px;padding:10px;font:700 .61rem var(--pixel);cursor:pointer}.case-tab.active{border-color:var(--pink);color:#fff;background:#3a2037}.case-tab.done{color:var(--good);border-color:#2c7459}.case-content{border:1px solid #385274;background:#0e1a2e;border-radius:12px;min-height:440px;padding:clamp(17px,3vw,28px);position:relative;overflow:hidden}.case-stamp{font:800 .58rem var(--pixel);color:var(--pink);letter-spacing:.13em;margin-bottom:13px}.case-title{color:var(--yellow);font:900 clamp(1.1rem,3vw,1.7rem)/1.25 var(--pixel);margin-bottom:17px}.case-message{white-space:pre-line;color:#d8e3f4;font-size:.96rem;line-height:1.9;min-height:230px}.case-message .japanese{color:var(--cyan)}.case-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap}.case-status{font:600 .62rem var(--pixel);color:#8298b9}
+#policeScene{position:fixed;inset:0;z-index:100;background:#090f1d;display:none;align-items:center;justify-content:center;overflow:hidden;padding:18px}#policeScene.active{display:flex;animation:pop .25s ease both}.police-flash{position:absolute;inset:0;pointer-events:none;animation:flashR .38s steps(2) infinite}.police-flash:after{content:"";position:absolute;inset:0;animation:flashB .38s steps(2) infinite}.police-content{position:relative;z-index:2;width:min(850px,100%);text-align:center}.police-kicker{font:800 .7rem var(--pixel);color:var(--yellow);letter-spacing:.12em}.police-title{font:900 clamp(2rem,8vw,5rem)/1 var(--pixel);text-shadow:4px 4px #c22c56,-4px -4px #1c61d4;margin:16px 0}.police-sub{font:700 clamp(.7rem,2vw,.9rem)/1.8 var(--pixel);color:#eaf2ff}.police-road{height:160px;position:relative;overflow:hidden;border-block:4px solid #d6e5ff;background:repeating-linear-gradient(0deg,#202a3b 0 54px,#303b4d 54px 58px,#202a3b 58px 108px);margin:25px 0 17px}.police-road:after{content:"";position:absolute;left:0;right:0;top:76px;height:5px;background:repeating-linear-gradient(90deg,#fff 0 45px,transparent 45px 90px);opacity:.65}.police-car{position:absolute;z-index:2;left:0;top:40px;width:150px;height:76px;animation:driveLeft 3.3s cubic-bezier(.1,.8,.3,1) both}.police-car-emoji{font-size:88px;line-height:1;filter:drop-shadow(0 7px 0 #070b12);transform:scaleX(-1)}.police-car-img{display:none;position:absolute;inset:0;width:150px;height:76px;object-fit:contain;transform:scaleX(-1);filter:drop-shadow(0 7px 0 #070b12)}.police-lights{position:absolute;left:52px;top:-2px;width:42px;height:11px;display:flex;gap:4px}.police-lights i{height:100%;width:50%;border-radius:4px 4px 1px 1px;background:#ff3f63;animation:siren .25s steps(2) infinite}.police-lights i+ i{background:#3e9cff;animation-delay:.125s}.permit-box{border:1px solid #9c4c71;background:#1b1830;padding:17px;border-radius:12px;max-width:570px;margin:auto;box-shadow:0 0 30px #ff4f7a24}.permit-meter{height:9px;background:#3a2740;border-radius:20px;overflow:hidden;margin:12px 0}.permit-fill{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--yellow));transition:width .15s}.permit-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}.permit-result{font:800 .7rem var(--pixel);color:var(--good);margin-top:12px;min-height:1.3em}.police-skip{margin-top:13px;background:none;border:0;color:#c2ccdc;text-decoration:underline;cursor:pointer;font:600 .6rem var(--pixel)}
+.vn-panel{max-width:850px;margin:0 auto}.vn-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}.vn-tag{font:700 .63rem var(--pixel);color:var(--cyan);letter-spacing:.1em}.vn-count{font:600 .63rem var(--pixel);color:#8093b3}.vn-scene{display:grid;grid-template-columns:165px minmax(0,1fr);gap:18px;align-items:end;min-height:280px}.vn-portrait{height:245px;border:1px solid #365174;border-radius:11px;background:linear-gradient(160deg,#1a3152,#101a2d);display:grid;place-items:center;overflow:hidden;position:relative}.vn-portrait img{width:100%;height:100%;object-fit:cover;display:none}.vn-portrait .portrait-placeholder{font-size:5rem;filter:drop-shadow(0 8px 0 #050a13);animation:float 2s ease-in-out infinite}.vn-portrait:after{content:"ANONYMOUS BAKA";position:absolute;bottom:0;left:0;right:0;text-align:center;background:#0b1427d9;padding:7px;font:700 .57rem var(--pixel);color:var(--cyan);letter-spacing:.07em}.vn-dialogue{border:1px solid #3a5479;background:#101d33;border-radius:11px;padding:19px;min-height:210px;box-shadow:0 7px 0 #060c16}.vn-dialogue .speaker{font:800 .64rem var(--pixel);color:var(--pink);letter-spacing:.1em;margin-bottom:13px}.vn-line{font-size:clamp(.95rem,2.2vw,1.08rem);line-height:1.9;color:#e5ecf8;min-height:105px;white-space:pre-line}.vn-next{display:flex;justify-content:flex-end;margin-top:12px}
+.breath-box{border:1px solid #314a70;background:#0c172a;border-radius:12px;padding:16px;margin-top:20px;text-align:center}.breath-orb{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e0fbff,#54d5e8 45%,#3865a8);box-shadow:0 0 24px #55e6ef55;margin:14px auto;transform:scale(1);transition:transform 3.5s ease}.breath-orb.breathe{transform:scale(1.65)}
+.final-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px}.final-card{border:1px solid #314a70;border-radius:12px;background:#0c172a;padding:16px}.final-card h3{font-size:.85rem;color:var(--yellow)}.dog-picture{height:175px;border:1px dashed #496586;border-radius:9px;background:repeating-linear-gradient(135deg,#14243d,#14243d 12px,#182b48 12px,#182b48 24px);display:grid;place-items:center;overflow:hidden}.dog-picture img{width:100%;height:100%;object-fit:cover;display:none}.dog-fallback{text-align:center;color:#9eb0ca;font:600 .62rem/1.8 var(--pixel)}.dog-fallback b{display:block;font-size:3.3rem}.paw-btn{margin-top:12px;width:100%}.paw-meter{font:700 .62rem var(--pixel);color:var(--cyan);margin-top:9px}.cake{font-size:5rem;text-align:center;filter:drop-shadow(0 9px 0 #080f1b);margin:8px 0}.candles{display:flex;justify-content:center;gap:15px}.candle{border:1px solid #4a5776;background:#1a2943;border-radius:8px;font-size:1.8rem;padding:6px 13px;cursor:pointer;box-shadow:0 4px 0 #070c15}.candle.off{filter:grayscale(1);opacity:.5}.cake-status{font:700 .62rem var(--pixel);color:var(--yellow);text-align:center;margin-top:13px;min-height:1.2em}.final-wish{max-width:730px;margin:0 auto;font-size:1rem;line-height:1.95;color:#dce6f5}.final-wish p{margin:0 0 10px}.signature{border-top:1px dashed #385274;padding-top:21px;margin-top:22px;opacity:0;transform:translateY(12px);transition:opacity .9s,transform .9s;text-align:center}.signature.visible{opacity:1;transform:none}.signature .sig-line{font:italic 1rem Georgia,serif;color:#c6adff}.signature .sig-anon{font-size:.82rem;color:#8fa2c3;margin:10px 0}.signature .sig-shout{font:900 clamp(1.1rem,4vw,1.8rem) var(--pixel);color:var(--pink);text-shadow:3px 3px #57243e}
+.toast{position:fixed;z-index:120;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;background:#101f36;border:1px solid #466286;border-radius:9px;padding:11px 15px;color:#e9f4ff;font:700 .65rem var(--pixel);box-shadow:0 8px 30px #0008;transition:.25s;pointer-events:none;text-align:center;max-width:calc(100% - 30px)}.toast.show{opacity:1;transform:translate(-50%,0)}
+.footer{font:600 .6rem var(--pixel);color:#607696;text-align:center;margin:18px 0 0}
+.confetti{position:fixed;top:-15px;z-index:130;width:8px;height:14px;animation:confettiFall 2.5s linear forwards;pointer-events:none}
+@media(max-width:720px){.intro-grid{grid-template-columns:1fr}.photo-stack{grid-template-columns:1fr 1fr}.photo-frame{height:140px}.case-layout{grid-template-columns:1fr}.case-sidebar{order:2}.case-list{grid-template-columns:repeat(3,1fr)}.case-tab{font-size:.53rem;text-align:center;padding:9px 5px}.case-content{min-height:410px}.vn-scene{grid-template-columns:115px minmax(0,1fr);gap:10px;min-height:260px}.vn-portrait{height:215px}.vn-dialogue{padding:13px;min-height:200px}.vn-line{font-size:.89rem}.final-grid{grid-template-columns:1fr}.stage-name{display:none}.quest-track{width:30vw}}
+@media(max-width:460px){.wrap{width:calc(100% - 16px);padding-top:9px}.hud{gap:7px;padding:8px}.brand{font-size:.57rem}.sound-toggle{font-size:.56rem;padding:7px}.panel{padding:17px;border-radius:13px}.hero-sprite{height:120px}.sprite-card{transform:scale(.85)}.photo-stack{grid-template-columns:1fr 1fr}.photo-frame{height:115px}.game-controls{gap:7px}.game-key{width:49px;height:45px}.jump-key{width:72px}.control-help{font-size:.53rem}.vn-scene{grid-template-columns:1fr;align-items:stretch}.vn-portrait{height:125px;width:100%;max-width:150px;margin:auto}.vn-portrait .portrait-placeholder{font-size:3.2rem}.vn-portrait:after{font-size:.48rem}.vn-dialogue{min-height:auto}.vn-line{min-height:130px}.case-message{min-height:245px;font-size:.89rem}.permit-box{padding:13px}.police-road{height:125px}.police-car{top:30px}.police-car-emoji{font-size:75px}}
+</style>
+</head>
+<body>
+<div id="ambient" aria-hidden="true"></div>
+<main class="wrap">
+  <header class="hud">
+    <div class="brand">NAV-CHAN<span>.EXE</span></div>
+    <div class="stage-meta"><span class="stage-name" id="stageName">BOOT SEQUENCE</span><div class="quest-track"><div class="quest-fill" id="questFill"></div></div></div>
+    <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">♫ SOUND: OFF</button>
+  </header>
+
+  <!-- TITLE / START -->
+  <section class="screen active" id="screen-start">
+    <div class="panel boot">
+      <div class="boot-inner">
+        <div class="pixel-badge">UNOFFICIAL BIRTHDAY BUILD // VER 15.0</div>
+        <div class="hero-sprite" aria-hidden="true">
+          <div class="sprite-card"><div class="sprite-shadow"></div><div class="sprite-face"><div class="sprite-eyes"><i></i><i></i></div><span class="sprite-mouth">ω</span></div></div>
+          <div class="envelope">💌</div>
+          <div class="sprite-card" style="animation-delay:-.8s"><div class="sprite-shadow"></div><div class="sprite-face" style="background:#f8d0aa"><div class="sprite-eyes"><i></i><i></i></div><span class="sprite-mouth">ᴗ</span></div></div>
+        </div>
+        <p class="kicker">A VERY SERIOUS DELIVERY MISSION</p>
+        <h1 class="title-glitch">NAVVV<br><span class="pink">cHAAANNN</span></h1>
+        <p class="boot-lines">E-etto... umm...<br>A-ah... bonJOUrrr...<br><strong>HAPPY bIRTH DAYYYYY!! 🎂</strong><br>お、お誕生日おめでとう〜！！</p>
+        <div class="btn-row"><button class="btn primary" id="startBtn">▶ PRESS START</button><button class="btn ghost" id="howBtn">HOW TO PLAY?</button></div>
+        <p class="blink">▼ INSERT ONE (1) BRAIN CELL TO CONTINUE ▼</p>
+        <div id="howPanel" class="dialogue" hidden><div class="speaker">GAME MANUAL / VERY IMPORTANT</div><div class="dialogue-text">Move: A / D or ← / → · Jump: Space / W / ↑
+Collect 7 birthday stars. Avoid the paperwork gremlins.
+Mobile: use the on-screen buttons. No rush; you can skip the level.
+Sound is optional and OFF by default.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISUAL NOVEL INTRO -->
+  <section class="screen" id="screen-intro">
+    <div class="panel">
+      <p class="kicker">SCENE 01 // THE BIRTHDAY LETTER</p>
+      <div class="intro-grid">
+        <div class="intro-copy">
+          <h2>Umm.. today is your <span class="cyan">special day</span>, right..?</h2>
+          <p>like.. the day the world got one very confusing little creature.. 😭</p>
+          <p class="quote">Kyō wa, kimi ni totte tokubetsu na hi da ne...</p>
+          <p>I hope this year will be full of happiness, little miracles and moments that makes you smile.. even on days when you dont really feel like smiling..</p>
+          <p>semoga hari hari kamu selalu dipenuhi hal hal kecil yang bikin kamu bahagia, orang orang yang tulus, and more reasons to smilee..</p>
+          <p class="quote">Quod bonum, felix, faustum fortunatumque sit 🕊️</p>
+          <p>may all the good things, happiness and luck come to you.. ehehe.. you deserve it.. i guess.. hmph &gt;&lt;</p>
+          <p class="pink" style="font:800 .75rem var(--pixel)">BUT WAITTTT... THERE'S A SIDE QUEST.</p>
+        </div>
+        <aside class="photo-stack">
+          <div class="photo-slot"><div class="photo-frame"><img data-asset="nav-chan.png" alt="Nav-chan"><div class="photo-placeholder"><b>👾</b>INSERT NAV-CHAN<br>Asset/Image/nav-chan.png</div></div><div class="photo-label">SUBJECT 001 // NAV-CHAN</div></div>
+          <div class="photo-slot"><div class="photo-frame"><img data-asset="navvy-dog.png" alt="Nav-chan's dog"><div class="photo-placeholder"><b>🐶</b>VERY IMPORTANT DOG<br>Asset/Image/navvy-dog.png</div></div><div class="photo-label">VIP // DOGGO DIVISION</div></div>
+        </aside>
+      </div>
+      <div class="btn-row"><button class="btn cyan-btn" id="enterGameBtn">START THE BIRTHDAY QUEST →</button><button class="btn ghost" id="skipGameBtn">SKIP GAME (I'M LAZY)</button></div>
+    </div>
+  </section>
+
+  <!-- 2D PLATFORMER -->
+  <section class="screen" id="screen-platformer">
+    <div class="panel">
+      <p class="kicker">MINI-GAME 01 // SIDE-SCROLLING DELIVERY RUN</p>
+      <div class="quest-brief"><div><h2>THE STAR <span class="yellow">DELIVERY</span></h2><p>Our anonymous courier has dropped the birthday stars. Collect them, dodge the paperwork gremlins, and deliver the letter to Nav-chan's mailbox.</p></div><div class="lives" id="livesHud">♥ ♥ ♥</div></div>
+      <div class="platform-wrap" style="position:relative">
+        <div class="game-top"><span class="game-chip">STARS: <b id="starCount">0 / 7</b></span><span class="game-chip">DISTANCE: <b id="distanceHud">0%</b></span><span class="game-chip">BEST FRIEND RANK: <b>BAKA</b></span></div>
+        <canvas id="platformCanvas" width="960" height="430" aria-label="A side scrolling platform game. Collect stars and reach the mailbox."></canvas>
+        <div class="game-overlay" id="gameOverlay"><div class="overlay-box"><h3 id="overlayTitle">LEVEL CLEAR!</h3><p id="overlayText">You did it. The letter is only slightly crumpled.</p><button class="btn primary" id="overlayContinue">CONTINUE →</button></div></div>
+        <div class="game-controls">
+          <div class="move-controls"><button class="game-key" data-key="left" aria-label="Move left">◀</button><button class="game-key" data-key="right" aria-label="Move right">▶</button></div>
+          <div class="control-help">A / D or ← / → to move<br>SPACE / W / ↑ to jump</div>
+          <button class="game-key jump-key" data-key="jump" aria-label="Jump">JUMP ⤴</button>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn ghost" id="restartLevelBtn">↻ RESTART LEVEL</button><button class="btn ghost" id="skipPlatformBtn">SKIP LEVEL →</button></div>
+      <p class="tiny center" style="margin:13px 0 0">Tip: jump just before the gaps. The gremlins are made of unpaid paperwork and bad vibes.</p>
+    </div>
+  </section>
+
+  <!-- CASE FILES -->
+  <section class="screen" id="screen-cases">
+    <div class="panel">
+      <p class="kicker">SCENE 02 // THE OFFICIAL NAV-CHAN INVESTIGATION</p>
+      <h2>THE COMPLAINT <span class="pink">ARCHIVE</span></h2>
+      <p class="muted" style="line-height:1.7">Nine allegations. Zero evidence. One extremely confused detective. Select a case file to investigate.</p>
+      <div class="case-layout">
+        <aside class="case-sidebar"><h3>📁 CASE INDEX</h3><div class="case-list" id="caseList"></div><p class="tiny" style="margin:12px 0 0">FILED BY: ANONYMOUS BAKA<br>THREAT LEVEL: SILLY</p></aside>
+        <article class="case-content">
+          <div class="case-stamp" id="caseStamp">CASE 01 // SEALED</div>
+          <h3 class="case-title" id="caseTitle">SELECT A FILE, DETECTIVE.</h3>
+          <div class="case-message" id="caseMessage">Tap a case on the left to open the evidence. Please handle the documents carefully. They are printed on very dramatic paper.</div>
+          <div class="case-footer"><span class="case-status" id="caseStatus">EVIDENCE LOCKED</span><div class="btn-row" style="margin:0"><button class="btn ghost" id="casePrev">← PREV</button><button class="btn primary" id="caseNext">OPEN FILE →</button></div></div>
+        </article>
+      </div>
+      <div class="btn-row"><button class="btn ghost" id="toSupportBtn" disabled>JOKES ASIDE... ♡</button></div>
+    </div>
+  </section>
+
+  <!-- HEARTFELT VISUAL NOVEL -->
+  <section class="screen" id="screen-support">
+    <div class="panel">
+      <p class="kicker">SCENE 03 // THE MUSIC QUIETS DOWN</p>
+      <div class="vn-panel">
+        <div class="vn-top"><span class="vn-tag">♡ A MESSAGE FROM YOUR BAKA FRIEND</span><span class="vn-count" id="vnCount">01 / 31</span></div>
+        <div class="vn-scene">
+          <div class="vn-portrait"><img data-asset="nav-chan.png" alt="Nav-chan portrait"><div class="portrait-placeholder">૮₍ ˶ᵔ ᵕ ᵔ˶ ₎ა</div></div>
+          <div class="vn-dialogue"><div class="speaker">ANONYMOUS FRIEND</div><div class="vn-line" id="vnLine" aria-live="polite">Umm.. jokes aside..</div><div class="vn-next"><button class="btn cyan-btn" id="vnNext">NEXT ▷</button></div></div>
+        </div>
+      </div>
+      <div class="breath-box"><p class="kicker">OPTIONAL LITTLE PAUSE</p><p style="color:#cfdbed;margin:0">No need to do anything perfectly. Just watch the tiny star breathe.</p><div class="breath-orb" id="breathOrb"></div><button class="btn ghost" id="breathBtn">GIVE THE STAR A LITTLE BREAK</button></div>
+    </div>
+  </section>
+
+  <!-- FINALE -->
+  <section class="screen" id="screen-final">
+    <div class="panel">
+      <p class="kicker">FINAL SCENE // BIRTHDAY COMPLETE (ALMOST)</p>
+      <div class="center"><h2>HAPPY BIRTHDAY, <span class="pink">NAV-CHAN!!</span></h2><p class="muted">E-etto... umm... i guess that's all.. 😳</p></div>
+      <div class="final-wish center">
+        <p>お誕生日おめでとう、Navvy cHAAANNN!! 🎂</p><p class="quote">Joyeux anniversaireee~</p><p>semoga kamu selalu bahagia yaaa..</p><p class="quote">même de loin.. je te souhaite tout le bonheur du monde..</p><p>even from afar.. i wish you all the happiness in the world..</p><p>stay silly.. stay confusing.. stay a little evil..</p><p class="yellow" style="font:900 .9rem var(--pixel)">BUT PLEASE STAY HAPPY TOO..</p><p>ehehe.. &gt;&lt;</p>
+      </div>
+      <div class="final-grid">
+        <section class="final-card"><p class="kicker">BONUS SIDE QUEST // DOGGO DIVISION</p><h3>I HAVE ONE COMPLAINT...</h3><div class="dog-picture"><img data-asset="navvy-dog.png" alt="Nav-chan's dog"><div class="dog-fallback"><b>🐶</b>VIP DOG SLOT<br>Asset/Image/navvy-dog.png</div></div><p style="color:#d4deef;line-height:1.7;margin:12px 0 0">I have complaints about Nav-chan... but your dog? NO COMPLAINTS. ABSOLUTELY PERFECT. I LOVE YOUR DOG &gt;-&lt; hehehe.</p><button class="btn pink-btn paw-btn" id="petDog">🐾 GIVE A VIRTUAL PAT</button><div class="paw-meter" id="pawMeter">DOGGO AFFECTION: 0 / 3</div></section>
+        <section class="final-card"><p class="kicker">FINAL MINI-GAME // WISH PROTOCOL</p><h3>EXTINGUISH THE CANDLES!</h3><div class="cake">🎂</div><p class="tiny center">Make a tiny wish. Then tap each candle.</p><div class="candles"><button class="candle" data-candle="0" aria-label="Blow out candle one">🕯️</button><button class="candle" data-candle="1" aria-label="Blow out candle two">🕯️</button><button class="candle" data-candle="2" aria-label="Blow out candle three">🕯️</button></div><p class="cake-status" id="cakeStatus">CANDLES STILL GLOWING: 3</p></section>
+      </div>
+      <div class="signature" id="signature"><p class="sig-line">— quelqu'un qui te souhaite du bonheur, même de loin ♡</p><p class="sig-anon">an anonymous little hater who secretly wishes you the happiest birthday..</p><p class="sig-shout">nAVVV cHAAANNN...</p><p class="pink" style="font:800 .82rem var(--pixel)">HumpppHHHHH... 😳</p><p style="font:900 clamp(.75rem,2vw,1rem) var(--pixel);line-height:1.9;color:var(--yellow)">PUcuK Ubii PUCuK KANgkunGG<br>BANyAK BUNyI PECAH MUNCunGG<br>PANTEEEEEEKKkkkkKKK~~<br>PaLPAlePAlepAlepaleapelaepElAepALeAPElAEOAWLjfghAEKS:IUGEIKSU:HYGK:uAEHSFK:aehsufklr;AGWL"fihAWKL:fguA:KUWghAKW:UWfghALWK: I loVE YOu NAVv NAVv chan &gt;_&lt;</p></div>
+      <div class="btn-row"><button class="btn primary" id="restartBtn">↻ PLAY AGAIN</button><button class="btn ghost" id="secretBtn" hidden>??? SECRET FILE ???</button></div>
+      <div id="secretNote" class="dialogue" hidden><div class="speaker">HIDDEN MESSAGE FOUND</div><div class="dialogue-text">psst... one more thing.
+Even from a distance, I hope you know there is a friend quietly cheering for you.
+You don't need to earn that kindness. Happy birthday, Nav-chan. ♡</div></div>
+    </div>
+  </section>
+  <p class="footer">A SMALL BIRTHDAY GAME // BUILT WITH HTML, CSS & VANILLA JS // NO ROMANCE, JUST BAKA FRIEND ENERGY</p>
+</main>
+
+<!-- POLICE CUTSCENE + PERMIT QTE -->
+<div id="policeScene" role="dialog" aria-modal="true" aria-labelledby="policeTitle" aria-hidden="true">
+  <div class="police-flash"></div>
+  <div class="police-content">
+    <div class="police-kicker">🚨 EMERGENCY BIRTHDAY BROADCAST 🚨</div>
+    <h2 class="police-title" id="policeTitle">YOU'RE FIFTEENNN!!</h2>
+    <p class="police-sub">OFFICERRRR... I AM JUST HERE TO DELIVER A BIRTHDAY LETTER!!</p>
+    <div class="police-road"><div class="police-car" id="policeCar"><div class="police-lights"><i></i><i></i></div><img class="police-car-img" id="policeCarImg" src="Asset/Image/police-car.png" alt=""><div class="police-car-emoji" id="policeCarEmoji">🚓</div></div></div>
+    <div class="permit-box" id="permitBox"><p class="kicker" style="color:var(--pink);margin-bottom:7px">PLATONIC FRIENDSHIP PERMIT // QUICK-TIME EVENT</p><h3 style="color:#fff">DECLARE YOUR FRIENDSHIP!</h3><p class="tiny">The officer demands proof that you are simply a very confused friend delivering a birthday letter. Tap the button 5 times!</p><div class="permit-meter"><div class="permit-fill" id="permitFill"></div></div><div class="permit-actions"><button class="btn primary" id="permitTap">I'M JUST A FRIEND!! (0/5)</button></div><div class="permit-result" id="permitResult" aria-live="polite"></div></div>
+    <button class="police-skip" id="policeSkip">skip the paperwork (the officer is sleepy)</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<audio id="bgm" loop preload="none" src="Asset/Audio/birthday-theme.mp3"></audio>
+<audio id="sfxStar" preload="none" src="Asset/Audio/star-pickup.mp3"></audio>
+<audio id="sfxJump" preload="none" src="Asset/Audio/jump.mp3"></audio>
+<audio id="sfxSiren" preload="none" src="Asset/Audio/police-siren.mp3"></audio>
+<audio id="sfxPat" preload="none" src="Asset/Audio/dog-pat.mp3"></audio>
+<audio id="sfxCandle" preload="none" src="Asset/Audio/candle-blow.mp3"></audio>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const screens=['start','intro','platformer','cases','support','final'];
+let activeScreen='start',soundOn=false,toastTimer=0,starsCollected=0,levelWon=false,caseIndex=0,caseRevealed=false,caseDone=new Set(),vnIndex=0,pats=0,candlesOut=0,perfectRun=false;
+const progress={start:0,intro:10,platformer:30,cases:58,support:82,final:100};
+
+// Ambient stars
+for(let i=0;i<34;i++){const s=document.createElement('span');s.className='ambient-star';s.textContent=i%4===0?'✦':'·';s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*100)+'%';s.style.animationDelay=(Math.random()*3)+'s';$('ambient').appendChild(s)}
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2100)}
+function showScreen(name){activeScreen=name;screens.forEach(s=>$('screen-'+s).classList.toggle('active',s===name));$('questFill').style.width=progress[name]+'%';$('stageName').textContent=({start:'BOOT SEQUENCE',intro:'BIRTHDAY LETTER',platformer:'STAR DELIVERY RUN',cases:'CASE ARCHIVE',support:'JOKES ASIDE',final:'BIRTHDAY COMPLETE'})[name];window.scrollTo({top:0,behavior:reduced?'auto':'smooth'});if(name==='platformer')startGame();else stopGame();if(name==='support')renderVN()}
+function play(id){if(!soundOn)return;const a=$(id);if(!a)return;try{a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(_){}}
+function toggleSound(){soundOn=!soundOn;$('soundToggle').textContent=soundOn?'♫ SOUND: ON':'♫ SOUND: OFF';$('soundToggle').classList.toggle('on',soundOn);$('soundToggle').setAttribute('aria-pressed',String(soundOn));if(soundOn){$('bgm').volume=.28;const p=$('bgm').play();if(p&&p.catch)p.catch(()=>{toast('Add Asset/Audio/birthday-theme.mp3 to use the soundtrack.')});}else $('bgm').pause();toast(soundOn?'Sound enabled (optional audio files only).':'Sound off. Quiet mode activated.')}
+$('soundToggle').addEventListener('click',toggleSound);
+function setOptionalImages(){document.querySelectorAll('img[data-asset]').forEach(img=>{const fallback=img.parentElement.querySelector('.photo-placeholder, .portrait-placeholder, .dog-fallback');img.onload=()=>{img.style.display='block';if(fallback)fallback.style.display='none'};img.onerror=()=>{img.style.display='none';if(fallback)fallback.style.display='grid'};img.src='Asset/Image/'+img.dataset.asset})}
+setOptionalImages();
+const policeCarImg=$('policeCarImg');if(policeCarImg){policeCarImg.onload=()=>{policeCarImg.style.display='block';$('policeCarEmoji').style.display='none'};policeCarImg.onerror=()=>{policeCarImg.style.display='none';$('policeCarEmoji').style.display='block'};}
+$('howBtn').addEventListener('click',()=>{$('howPanel').hidden=!$('howPanel').hidden});
+$('startBtn').addEventListener('click',()=>showScreen('intro'));
+$('enterGameBtn').addEventListener('click',()=>showScreen('platformer'));
+$('skipGameBtn').addEventListener('click',()=>{toast('Quest skipped. The courier took a shortcut.');showScreen('cases')});
+
+// --- Platformer engine ---
+const canvas=$('platformCanvas'),ctx=canvas.getContext('2d');
+const W=960,H=430,worldW=2380,groundY=356;
+const grounds=[[0,600],[680,1195],[1285,1740],[1830,2380]];
+const platforms=[{x:315,y:284,w:145},{x:785,y:284,w:145},{x:1030,y:240,w:125},{x:1390,y:286,w:155},{x:1640,y:235,w:130},{x:1950,y:285,w:145}];
+const starSeeds=[{x:210,y:294},{x:400,y:242},{x:735,y:290},{x:930,y:230},{x:1132,y:190},{x:1460,y:230},{x:1702,y:185}];
+const hazards=[{x:510,y:337,w:28,h:19,phase:0},{x:900,y:337,w:30,h:19,phase:1.7},{x:1500,y:337,w:32,h:19,phase:3.2},{x:1980,y:337,w:30,h:19,phase:2.2}];
+let game={running:false,raf:0,last:0,camera:0,player:{x:45,y:310,vx:0,vy:0,w:25,h:37,onGround:false,face:1,blink:0},stars:[],hazards:[],lives:3,invuln:0,keys:{left:false,right:false,jump:false},jumpLock:false,checkpoint:45};
+function resetGame(){game.player={x:45,y:310,vx:0,vy:0,w:25,h:37,onGround:false,face:1,blink:0};game.camera=0;game.lives=3;game.invuln=0;game.stars=starSeeds.map(s=>({...s,got:false,phase:Math.random()*6}));game.hazards=hazards.map(h=>({...h}));starsCollected=0;levelWon=false;game.last=0;updateGameHud();$('gameOverlay').classList.remove('show')}
+function updateGameHud(){ $('starCount').textContent=starsCollected+' / 7';$('distanceHud').textContent=Math.min(100,Math.floor((game.player.x/(worldW-65))*100))+'%';$('livesHud').textContent='♥ '.repeat(Math.max(0,game.lives))+'♡ '.repeat(Math.max(0,3-game.lives)) }
+function startGame(){if(levelWon)return;game.running=true;resetGame();if(!game.raf)game.raf=requestAnimationFrame(gameLoop)}
+function stopGame(){game.running=false;Object.keys(game.keys).forEach(k=>game.keys[k]=false)}
+function restartLevel(){resetGame();game.running=true;toast('New run! Go get those stars.')}
+$('restartLevelBtn').addEventListener('click',restartLevel);
+$('skipPlatformBtn').addEventListener('click',()=>completeLevel(true));
+function rectHit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function isGroundAt(x){return grounds.find(g=>x+game.player.w>g[0]&&x<g[1])}
+function hitLife(){if(game.invuln>0)return;game.lives--;game.invuln=95;play('sfxJump');game.player.vy=-5;game.player.vx=-game.player.face*3.6;if(game.lives<=0){game.lives=3;game.player.x=Math.max(45,game.checkpoint-120);game.player.y=300;game.player.vy=0;toast('OOPS! The paperwork gremlin got you. Respawn!')}else toast('BONK! Watch out for the gremlin!');updateGameHud()}
+function updateGame(dt){const p=game.player;const speed=3.35;
+  p.vx=(game.keys.left?-speed:0)+(game.keys.right?speed:0);if(game.keys.left)p.face=-1;if(game.keys.right)p.face=1;
+  if(game.keys.jump&&!game.jumpLock&&p.onGround){p.vy=-10.8;p.onGround=false;game.jumpLock=true;play('sfxJump')}if(!game.keys.jump)game.jumpLock=false;
+  p.x=Math.max(0,Math.min(worldW-p.w,p.x+p.vx*dt));p.vy=Math.min(13,p.vy+.53*dt);const prevBottom=p.y+p.h;p.y+=p.vy*dt;p.onGround=false;
+  // Land on ground islands or raised platforms.
+  let landing=null;for(const g of grounds){if(p.x+p.w>g[0]&&p.x<g[1]&&prevBottom<=groundY&&p.y+p.h>=groundY&&p.vy>=0){landing=groundY;break}}
+  for(const pl of platforms){if(p.x+p.w>pl.x&&p.x<pl.x+pl.w&&prevBottom<=pl.y&&p.y+p.h>=pl.y&&p.vy>=0){if(landing===null||pl.y<landing)landing=pl.y}}
+  if(landing!==null){p.y=landing-p.h;p.vy=0;p.onGround=true}
+  if(p.y>H+40){hitLife();p.x=Math.max(game.checkpoint,p.x-110);p.y=260;p.vy=0}
+  if(p.x>760&&game.checkpoint<680)game.checkpoint=680;if(p.x>1365&&game.checkpoint<1285)game.checkpoint=1285;if(p.x>1910&&game.checkpoint<1830)game.checkpoint=1830;
+  if(game.invuln>0)game.invuln--;
+  game.hazards.forEach((h,i)=>{const hx=h.x+Math.sin(performance.now()/470+h.phase)*23;const hb={x:hx,y:h.y,w:h.w,h:h.h};if(rectHit(p,hb))hitLife()});
+  game.stars.forEach(s=>{if(!s.got&&rectHit(p,{x:s.x-10,y:s.y-10,w:20,h:20})){s.got=true;starsCollected++;play('sfxStar');toast('STAR ACQUIRED! +1 tiny bit of competence');updateGameHud()}});
+  game.camera=Math.max(0,Math.min(worldW-W,p.x-W*.36));updateGameHud();if(p.x>worldW-100){completeLevel(false)}
+}
+function drawPixelStar(x,y,r,color){ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(performance.now()/300+x)*.14);ctx.fillStyle=color;ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}ctx.closePath();ctx.fill();ctx.restore()}
+function drawGame(){ctx.clearRect(0,0,W,H);const cam=game.camera;const t=performance.now()/1000;
+  // sky
+  const grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#101e3b');grad.addColorStop(.65,'#1d3151');grad.addColorStop(1,'#24334b');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  // moon + stars
+  ctx.fillStyle='#ffe9a1';ctx.beginPath();ctx.arc(810,65,27,0,Math.PI*2);ctx.fill();ctx.fillStyle='#172a49';ctx.beginPath();ctx.arc(822,55,25,0,Math.PI*2);ctx.fill();
+  for(let i=0;i<48;i++){let x=(i*173%W),y=(i*67%190);ctx.fillStyle=i%3===0?'#ffe16a':'#9beaf2';ctx.globalAlpha=.35+.45*Math.abs(Math.sin(t+i));ctx.fillRect(x,y,2,2)}ctx.globalAlpha=1;
+  // parallax skyline
+  for(let layer=0;layer<2;layer++){const speed=layer?.23:.42;for(let i=-1;i<13;i++){const bx=i*105-((cam*speed)%105),bh=85+((i*47+layer*23+1200)%80);ctx.fillStyle=layer?'#172b49':'#132541';ctx.fillRect(bx,H-bh-48,bx+75>0?75:0,bh);ctx.fillStyle='#4b6b8b';for(let wx=bx+12;wx<bx+65;wx+=19)for(let wy=H-bh-35;wy<H-65;wy+=22){ctx.globalAlpha=.45;ctx.fillRect(wx,wy,6,8)}ctx.globalAlpha=1}}
+  // background cable
+  ctx.strokeStyle='#3a5878';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,235);ctx.quadraticCurveTo(450,190,960,235);ctx.stroke();
+  // ground islands
+  grounds.forEach(([a,b])=>{const x=a-cam,w=b-a;ctx.fillStyle='#172843';ctx.fillRect(x,groundY,w,H-groundY);ctx.fillStyle='#4fd6d7';ctx.fillRect(x,groundY,w,7);ctx.fillStyle='#2e4565';for(let tx=x;tx<x+w;tx+=34){ctx.fillRect(tx,groundY+20,18,4);ctx.fillRect(tx+16,groundY+44,18,4)} });
+  // platforms
+  platforms.forEach(pl=>{const x=pl.x-cam;ctx.fillStyle='#4e6689';ctx.fillRect(x,pl.y,pl.w,12);ctx.fillStyle='#8a7dcd';ctx.fillRect(x,pl.y,pl.w,4);ctx.fillStyle='#243a5b';for(let q=x+10;q<x+pl.w;q+=22)ctx.fillRect(q,pl.y+12,5,7)});
+  // hazards: paperwork gremlins
+  game.hazards.forEach(h=>{const x=h.x-cam+Math.sin(t*2+h.phase)*23;if(x<-40||x>W+40)return;ctx.fillStyle='#ff6c91';ctx.fillRect(x,h.y,24,17);ctx.fillStyle='#7b294c';ctx.fillRect(x+4,h.y+5,4,5);ctx.fillRect(x+16,h.y+5,4,5);ctx.fillStyle='#ffe1a2';ctx.fillRect(x+8,h.y+12,9,3);ctx.fillStyle='#09111f';ctx.fillRect(x-3,h.y+17,8,3);ctx.fillRect(x+18,h.y+17,8,3)});
+  // collectibles
+  game.stars.forEach(s=>{if(s.got)return;drawPixelStar(s.x-cam,s.y+Math.sin(t*3+s.phase)*4,12,'#ffe16a');ctx.fillStyle='#fff5c5';ctx.fillRect(s.x-cam-2,s.y-3,4,7)});
+  // mailbox goal
+  const gx=worldW-100-cam;ctx.fillStyle='#ff6c91';ctx.fillRect(gx,groundY-55,38,54);ctx.fillStyle='#ffe16a';ctx.fillRect(gx+31,groundY-46,10,7);ctx.fillStyle='#d7e5f7';ctx.fillRect(gx+9,groundY-43,18,3);ctx.fillStyle='#a78bfa';ctx.fillRect(gx+16,groundY-1,6,17);ctx.font='18px monospace';ctx.fillText('✉',gx+8,groundY-20);
+  // player invulnerability blink
+  const p=game.player,px=p.x-cam,py=p.y;if(game.invuln===0||Math.floor(game.invuln/5)%2===0){ctx.save();ctx.translate(px+p.w/2,py);if(p.face<0)ctx.scale(-1,1);
+    // legs animate
+    ctx.fillStyle='#15233f';ctx.fillRect(-9,26,7,10);ctx.fillRect(3,26,7,10);ctx.fillStyle='#ffe16a';ctx.fillRect(-11,34,9,4);ctx.fillRect(2,34,10,4);
+    // body
+    ctx.fillStyle='#55e6ef';ctx.fillRect(-12,12,24,17);ctx.fillStyle='#1f5575';ctx.fillRect(-12,23,24,6);
+    // face
+    ctx.fillStyle='#ffcfaa';ctx.fillRect(-10,-4,20,18);ctx.fillStyle='#48345f';ctx.fillRect(-12,-10,24,11);ctx.fillRect(-12,-2,5,12);ctx.fillRect(7,-1,5,7);ctx.fillStyle='#162139';ctx.fillRect(-5,4,3,4);ctx.fillRect(4,4,3,4);ctx.fillStyle='#b24e75';ctx.fillRect(-1,10,5,2);
+    // envelope backpack
+    ctx.fillStyle='#ff6c91';ctx.fillRect(9,14,9,9);ctx.fillStyle='#fff0bd';ctx.beginPath();ctx.moveTo(9,14);ctx.lineTo(13.5,19);ctx.lineTo(18,14);ctx.fill();ctx.restore();}
+  // on-screen instruction strip
+  ctx.fillStyle='#07111fbb';ctx.fillRect(12,12,245,28);ctx.fillStyle='#c2d5ed';ctx.font='11px monospace';ctx.fillText('DELIVER THE LETTER // KEEP MOVING',22,30);
+}
+function gameLoop(ts){if(!game.running){game.raf=0;drawGame();return}game.raf=requestAnimationFrame(gameLoop);if(!game.last)game.last=ts;let dt=Math.min(2,(ts-game.last)/16.67);game.last=ts;if(activeScreen==='platformer')updateGame(dt);drawGame()}
+function completeLevel(skipped){if(levelWon)return;levelWon=true;game.running=false;perfectRun=starsCollected>=7;$('overlayTitle').textContent=skipped?'SHORTCUT UNLOCKED':'DELIVERY COMPLETE!';$('overlayText').textContent=skipped?'The courier used a highly suspicious teleportation service. No stars collected, but the letter arrived.':`You collected ${starsCollected}/7 stars. The letter arrived safely-ish. ${perfectRun?'PERFECT RUN! SECRET FILE UNLOCKED.':'The mailbox has accepted your extremely dramatic delivery.'}`;$('gameOverlay').classList.add('show');$('overlayContinue').textContent='OPEN THE CASE ARCHIVE →';if(perfectRun)toast('PERFECT RUN! SECRET FILE UNLOCKED!');}
+$('overlayContinue').addEventListener('click',()=>{showScreen('cases');initCases()});
+// keyboard controls
+const keyMap={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',Space:'jump',ArrowUp:'jump',KeyW:'jump'};
+window.addEventListener('keydown',e=>{const k=keyMap[e.code];if(k&&activeScreen==='platformer'){e.preventDefault();game.keys[k]=true}});
+window.addEventListener('keyup',e=>{const k=keyMap[e.code];if(k)game.keys[k]=false});
+// touch / mouse held buttons
+ document.querySelectorAll('[data-key]').forEach(btn=>{const k=btn.dataset.key;const on=e=>{e.preventDefault();game.keys[k]=true;btn.classList.add('held')};const off=e=>{e.preventDefault();game.keys[k]=false;btn.classList.remove('held')};btn.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(ev=>btn.addEventListener(ev,off))});
+$('restartLevelBtn').addEventListener('click',restartLevel);
+
+// --- Case archive ---
+const cases=[
+{title:'NAV CHAN ITU CEWEK BINGUNGGGG 😭',body:`like.. WHY ARE YOU LIKE THISSS??\n\nほんとに何考えてるの〜！？\n\nHontoni nani kangaeteru no~!?\n\nwhat are you even THINKINGGG..\nsometimes i think your brain has 47 tabs open and none of them are loading..\n\nHumpppHHH!! ><`,reaction:'🧠💫'},
+{title:'NAV CHAN IS TOO FRIENDLY...',body:`Nav-chan talks to EVERYBODY.. 😭\n\nlike girl... do you even know how many people are trying to talk to you??\n\n人懐っこすぎるよ〜！\n\nHitonatsukkosugiru yo~!\n\nyou're way too friendlyyy..\nand then i'm just standing there like..\n\nHUUUHHH??\nWHO IS THAT GUY NOW?? 😭\n\nhmph.. i dont understand your social life..`,reaction:'👥❔'},
+{title:'NAV CHAN HAS TOO MANY GUYS AROUND...',body:`U-umm.. i mean..\n\nhow do you even remember all of them..??\n\nNav-chan's social life is more complicated than my entire brain..\n\nなんでそんなに知り合いが多いの〜！？\n\nNande sonna ni shiriai ga ooi no~!?\n\nHUMPPPPHHH...\nbut yeah.. you can be friends with whoever you want, baka..\ni'm just confused.. as usual.. 😭`,reaction:'📋🫠'},
+{title:'NAV CHAN IS EVILLLL...',body:`humpppHHHHH ><\n\nほんとに悪い子だね！！\n\nHontoni warui ko da ne!\n\nyou're such a little menace..\n\nune petite diablesse...\n\nBUT WHY ARE YOU STILL SO NICE SOMETIMES??\nlike.. pick a side alreadyy..\nEVIL OR NICE??\nI NEED ANSWERS NAV CHANNN..`,reaction:'😈✨'},
+{title:'NAV CHAN IS SO CONFUSING...',body:`one moment you're like :D\n\nnext moment you're like :<\n\nand then i'm just sitting there like..\n\nEHHHHHHHHH??!?\nWHAT HAPPENED??\n\nえぇぇぇ〜！？！？\nEeeeeh~!?\n\ni swear.. trying to understand you is like solving a puzzle without the picture..\n\nなんでそんなに不思議なの〜！\nNande sonna ni fushigi na no~!\n\nWHY ARE YOU LIKE THISSS..`,reaction:'🧩❓'},
+{title:'NAV CHAN IS A LITTLE MENACE...',body:`Nav-chan is the type of person to say 'hehe'\n\nand then somehow cause 27 problems..\n\nほんとに困った子だねぇ〜\nHontoni komatta ko da ne~\n\nsuch a troublesome girl..\nehehe..\nbut.. i guess that's part of being Nav-chan..\n\nHMMPHHH.. ><`,reaction:'hehe → 💥'},
+{title:"NAV CHAN IS TOO CUTE WHEN SHE'S ANNOYING...",body:`ずるいよぉ〜！！\nZurui yo~!\n\nTHAT'S UNFAIRRR..\nhow can you be so annoying and cute at the same time??\n\nlike.. excuse me??\nwho gave you permission to be this confusing??\nit's illegal..\ni think.. 😭😭`,reaction:'⚖️🚨'},
+{title:'NAV CHAN IS FIFTEENNN... 😭',body:`E-etto... umm...\n\nyou're such a silly person.. BUT WAITTTT..\n\nYOU'RE FIFTEENNN!!\n\nOFFICERRRR...\nI AM JUST HERE TO DELIVER A BIRTHDAY LETTER..\nNO ROMANCE..\nJUST A VERY CONFUSED BAKA FRIEND..\n\nxixixixixi..\nhumpppHHHHH 😭`,reaction:'🚓📨'},
+{title:'NAV CHAN IS NAV CHAN...',body:`それが一番困るんだよぉ〜！！\n\nSore ga ichiban komarun da yo~!\n\nTHAT'S THE MOST TROUBLESOME THING ABOUT YOUUU..\n\nehehe..\nhmph.. ><`,reaction:'😭♡'}
+];
+function initCases(){caseIndex=0;caseRevealed=false;caseDone.clear();buildCaseTabs();renderCase()}
+function buildCaseTabs(){const list=$('caseList');list.innerHTML='';cases.forEach((c,i)=>{const b=document.createElement('button');b.className='case-tab';b.textContent=String(i+1).padStart(2,'0')+' // '+(['BRAIN TABS','SOCIAL LIFE','CONTACTS','EVIL?','CONFUSING','MENACE','UNFAIR','AGE ALERT','NAV-CHAN'][i]);b.addEventListener('click',()=>{caseIndex=i;caseRevealed=caseDone.has(i);renderCase()});list.appendChild(b)})}
+function renderCase(){const c=cases[caseIndex];$('caseStamp').textContent=`CASE ${String(caseIndex+1).padStart(2,'0')} // ${caseRevealed?'EVIDENCE OPEN':'SEALED'}`;$('caseTitle').textContent=caseRevealed?c.title:'CLASSIFIED BIRTHDAY EVIDENCE';$('caseMessage').textContent=caseRevealed?c.body:'🔒 FILE SEALED.\n\nThis document contains extremely serious allegations, mostly involving silly behaviour.\n\nTap OPEN FILE to reveal the evidence.';$('caseStatus').textContent=caseRevealed?'REACTION: '+c.reaction:'EVIDENCE LOCKED';$('caseNext').textContent=caseRevealed?(caseIndex===7?'TRIGGER POLICE INCIDENT 🚨':caseIndex===8?'FINISH INVESTIGATION →':'NEXT FILE →'):'OPEN FILE →';$('caseNext').disabled=!caseRevealed&&false;$('casePrev').disabled=caseIndex===0;$('toSupportBtn').disabled=caseDone.size!==9;document.querySelectorAll('.case-tab').forEach((b,i)=>{b.classList.toggle('active',i===caseIndex);b.classList.toggle('done',caseDone.has(i))})}
+function revealCase(){caseRevealed=true;caseDone.add(caseIndex);renderCase();if(caseIndex===7){toast('AGE ALERT DETECTED. POLICE HAVE BEEN NOTIFIED. 🚨')}else toast('Evidence revealed. The detective is still confused.')}
+$('caseNext').addEventListener('click',()=>{if(!caseRevealed){revealCase();return}if(caseIndex===7){startPoliceScene();return}if(caseIndex<8){caseIndex++;caseRevealed=caseDone.has(caseIndex);renderCase()}else{showScreen('support')}});
+$('casePrev').addEventListener('click',()=>{if(caseIndex>0){caseIndex--;caseRevealed=caseDone.has(caseIndex);renderCase()}});
+$('toSupportBtn').addEventListener('click',()=>{if(caseDone.size===9)showScreen('support')});
+
+// --- Police chase ---
+let permitTaps=0,permitTimer=null,policeDone=false;
+function startPoliceScene(){const scene=$('policeScene');scene.classList.add('active');scene.setAttribute('aria-hidden','false');$('permitBox').style.display='block';$('permitFill').style.width='0';$('permitResult').textContent='';$('permitTap').disabled=false;permitTaps=0;policeDone=false;$('permitTap').textContent="I'M JUST A FRIEND!! (0/5)";$('policeCar').style.animation='none';void $('policeCar').offsetWidth;$('policeCar').style.animation='driveLeft 3.3s cubic-bezier(.1,.8,.3,1) both';if(soundOn)play('sfxSiren');clearTimeout(permitTimer);permitTimer=setTimeout(()=>{if(!policeDone){$('permitResult').textContent='TIME UP. THE OFFICER NEEDS MORE PAPERWORK. TRY AGAIN OR SKIP.';$('permitTap').disabled=false;permitTaps=0;$('permitTap').textContent="RETRY PERMIT (0/5)";$('permitFill').style.width='0%'}},16000)}
+function closePolice(){clearTimeout(permitTimer);$('policeScene').classList.remove('active');$('policeScene').setAttribute('aria-hidden','true');$('sfxSiren').pause();caseIndex=7;caseRevealed=true;caseDone.add(7);renderCase();}
+$('permitTap').addEventListener('click',()=>{if(policeDone)return;permitTaps++;$('permitTap').textContent=`I'M JUST A FRIEND!! (${permitTaps}/5)`;$('permitFill').style.width=(permitTaps/5*100)+'%';if(permitTaps>=5){policeDone=true;clearTimeout(permitTimer);$('permitTap').disabled=true;$('permitResult').textContent='PERMIT APPROVED. FRIENDSHIP STATUS: 100% PLATONIC. ✅';toast('LICENSE APPROVED. PLEASE DRIVE SAFELY, BAKA.');setTimeout(closePolice,1700)}});
+$('policeSkip').addEventListener('click',()=>{policeDone=true;closePolice();toast('The officer let you go. He had a lunch break.')});
+
+// --- Sincere visual novel lines ---
+const vnLines=[
+'Umm.. jokes aside..','Nav-chan..',"I know things haven't always been easy for you lately..",'and.. i might not know everything you\'re going through..','maybe there are some things you dont really talk about..','or things that are difficult to explain..','but i hope you know..','you dont have to figure everything out all at once..','you dont have to be okay every single day..','and you dont have to pretend that everything is fine just because other people are around..','ゆっくりでいいよ..','Yukkuri de ii yo...','you can take your time..','semoga pelan pelan hari hari kamu jadi lebih ringan yaa..','and if some days feel really difficult..','i hope you remember that you still deserve kindness..','even when you\'re tired..','even when you\'re confused..','even when you dont really know what to do next..','you dont have to be perfect to be important..','and you dont have to make everybody happy to deserve happiness yourself..','i hope you find people who listen to you properly..','people who dont make you feel like you have to hide everything..','and people who remind you that you\'re not alone..','if things ever feel too heavy to handle by yourself..','please dont be afraid to talk to someone you trust..','someone who can actually be there for you..','you deserve that too..','and even if things dont magically become better overnight..','i hope little by little..','you\'ll find more reasons to smile again..','maybe through a random song..','a silly conversation..','a stupid little joke..','or just a random day that turns out to be better than you expected..',"i'm rooting for you, Nav-chan..",'as a friend..','いつも応援してるよ..','Itsumo ouen shiteru yo...','I\'m always cheering for you..'
+];
+function renderVN(){ $('vnCount').textContent=String(Math.min(vnIndex+1,vnLines.length)).padStart(2,'0')+' / '+String(vnLines.length).padStart(2,'0');$('vnLine').textContent=vnLines[vnIndex]||'';$('vnNext').textContent=vnIndex>=vnLines.length-1?'TO THE FINAL SCENE ♡':'NEXT ▷'}
+$('vnNext').addEventListener('click',()=>{if(vnIndex<vnLines.length-1){vnIndex++;renderVN()}else{showScreen('final')}});
+$('breathBtn').addEventListener('click',()=>{const orb=$('breathOrb');orb.classList.toggle('breathe');$('breathBtn').textContent=orb.classList.contains('breathe')?'LET THE STAR REST':'GIVE THE STAR A LITTLE BREAK'});
+
+// --- Dog pats, cake candles, secret file ---
+$('petDog').addEventListener('click',()=>{pats=Math.min(3,pats+1);$('pawMeter').textContent=`DOGGO AFFECTION: ${pats} / 3`;play('sfxPat');toast(['pat pat...','the dog approves.','DOGGO HAS ASCENDED TO LEGENDARY STATUS. 🐶'][pats-1]);$('petDog').textContent=pats===3?'🐾 DOGGO: OFFICIALLY LOVED':'🐾 GIVE A VIRTUAL PAT';checkSecret()});
+document.querySelectorAll('[data-candle]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.classList.contains('off'))return;btn.classList.add('off');btn.textContent='💨';candlesOut++;play('sfxCandle');$('cakeStatus').textContent=`CANDLES STILL GLOWING: ${3-candlesOut}`;if(candlesOut===3){$('signature').classList.add('visible');confetti();toast('WISH SENT. HAPPY BIRTHDAY, NAV-CHAN! 🎂')}checkSecret()}));
+function checkSecret(){if(perfectRun&&pats===3&&candlesOut===3){$('secretBtn').hidden=false;toast('ALL SIDE QUESTS COMPLETE. SECRET FILE AVAILABLE!')}}
+$('secretBtn').addEventListener('click',()=>{$('secretNote').hidden=!$('secretNote').hidden;$('secretBtn').textContent=$('secretNote').hidden?'??? SECRET FILE ???':'CLOSE SECRET FILE'});
+function confetti(){if(reduced)return;const colors=['#55e6ef','#ff6c91','#ffe16a','#a78bfa','#83f0b1'];for(let i=0;i<65;i++){const el=document.createElement('i');el.className='confetti';el.style.left=Math.random()*100+'vw';el.style.background=colors[i%colors.length];el.style.animationDelay=Math.random()*.8+'s';el.style.animationDuration=(1.7+Math.random()*1.4)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),3800)}}
+$('restartBtn').addEventListener('click',()=>{vnIndex=0;pats=0;candlesOut=0;perfectRun=false;starsCollected=0;caseDone.clear();caseRevealed=false;$('pawMeter').textContent='DOGGO AFFECTION: 0 / 3';$('petDog').textContent='🐾 GIVE A VIRTUAL PAT';document.querySelectorAll('[data-candle]').forEach(b=>{b.classList.remove('off');b.textContent='🕯️'});$('cakeStatus').textContent='CANDLES STILL GLOWING: 3';$('signature').classList.remove('visible');$('secretBtn').hidden=true;$('secretNote').hidden=true;initCases();showScreen('start')});
+
+// Init
+initCases();renderVN();resetGame();drawGame();
+})();
+</script>
+</body>
+</html>
